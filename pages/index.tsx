@@ -27,6 +27,7 @@ export default function Home() {
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // 初期ロード
   useEffect(() => {
@@ -300,75 +301,99 @@ export default function Home() {
             </div>
 
             {/* 設定 */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">設定</h2>
-              <div className="space-y-6">
-                {/* グローバルスロット数 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    基本スロット数: {state.settings.globalSlotCount}
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    value={state.settings.globalSlotCount}
-                    onChange={(e) =>
-                      setState((prev) => ({
-                        ...prev,
-                        settings: {
-                          ...prev.settings,
-                          globalSlotCount: Number(e.target.value),
-                        },
-                      }))
-                    }
-                    className="w-full"
-                  />
-                </div>
-                {/* スピン時間 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    スピン時間: {(state.settings.spinDuration / 1000).toFixed(1)}秒
-                  </label>
-                  <input
-                    type="range"
-                    min="2000"
-                    max="4000"
-                    step="100"
-                    value={state.settings.spinDuration}
-                    onChange={(e) =>
-                      setState((prev) => ({
-                        ...prev,
-                        settings: {
-                          ...prev.settings,
-                          spinDuration: Number(e.target.value),
-                        },
-                      }))
-                    }
-                    className="w-full"
-                  />
-                </div>
-                {/* 当たってほしい!!倍率 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ⭐倍率: {state.settings.specialMultiplier}倍
-                  </label>
-                  <input
-                    type="range"
-                    min="2"
-                    max="10"
-                    value={state.settings.specialMultiplier}
-                    onChange={(e) =>
-                      setState((prev) => ({
-                        ...prev,
-                        settings: {
-                          ...prev.settings,
-                          specialMultiplier: Number(e.target.value),
-                        },
-                      }))
-                    }
-                    className="w-full"
-                  />
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              {/* アコーディオンヘッダー */}
+              <button
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <h2 className="text-xl font-bold text-gray-800">設定</h2>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className={`w-6 h-6 transition-transform duration-200 ${isSettingsOpen ? 'rotate-180' : ''}`}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+              
+              {/* アコーディオンコンテンツ */}
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isSettingsOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="px-6 pb-6 space-y-6">
+                  {/* グローバルスロット数 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      基本スロット数: {state.settings.globalSlotCount}
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      value={state.settings.globalSlotCount}
+                      onChange={(e) =>
+                        setState((prev) => ({
+                          ...prev,
+                          settings: {
+                            ...prev.settings,
+                            globalSlotCount: Number(e.target.value),
+                          },
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
+                  {/* スピン時間 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      スピン時間: {(state.settings.spinDuration / 1000).toFixed(1)}秒
+                    </label>
+                    <input
+                      type="range"
+                      min="2000"
+                      max="4000"
+                      step="100"
+                      value={state.settings.spinDuration}
+                      onChange={(e) =>
+                        setState((prev) => ({
+                          ...prev,
+                          settings: {
+                            ...prev.settings,
+                            spinDuration: Number(e.target.value),
+                          },
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
+                  {/* 当たってほしい!!倍率 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ⭐倍率: {state.settings.specialMultiplier}倍
+                    </label>
+                    <input
+                      type="range"
+                      min="2"
+                      max="10"
+                      value={state.settings.specialMultiplier}
+                      onChange={(e) =>
+                        setState((prev) => ({
+                          ...prev,
+                          settings: {
+                            ...prev.settings,
+                            specialMultiplier: Number(e.target.value),
+                          },
+                        }))
+                      }
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
