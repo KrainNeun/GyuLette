@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { WheelSegment } from '@/lib/wheel';
 
 interface RouletteWheelProps {
@@ -15,7 +15,8 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  // 描画関数を分離
+  const drawWheel = useCallback(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -25,7 +26,10 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
 
     // コンテナのサイズを取得
     const containerWidth = container.clientWidth;
-    const size = Math.min(containerWidth, 400); // 最大5400px
+    const size = Math.min(containerWidth, 400); // 最大400px
+    
+    // サイズが0の場合は描画しない
+    if (size === 0) return;
     
     // Canvasの実際のサイズを設定
     canvas.width = size;
@@ -139,18 +143,23 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
     ctx.stroke();
   }, [segments, rotation]);
 
+  // 初回描画と更新時の描画
+  useEffect(() => {
+    drawWheel();
+  }, [drawWheel]);
+
   // ウィンドウリサイズ時に再描画
   useEffect(() => {
     const handleResize = () => {
-      // 再描画をトリガー
-      if (canvasRef.current) {
-        canvasRef.current.width = canvasRef.current.width;
-      }
+      drawWheel();
     };
     
     window.addEventListener('resize', handleResize);
+    // 初回マウント時にも実行
+    handleResize();
+    
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [drawWheel]);
 
   return (
     <div ref={containerRef} className="relative w-full">
