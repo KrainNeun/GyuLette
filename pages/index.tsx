@@ -28,6 +28,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
 
   // 初期ロード
   useEffect(() => {
@@ -202,34 +203,60 @@ export default function Home() {
           {/* 左カラム: 参加者管理 + 設定 */}
           <div className="lg:col-span-1 flex flex-col gap-6">
             {/* 参加者管理 */}
-            <div className="bg-white rounded-xl shadow-lg p-6 flex-1">
-              {/* 参加者追加 */}
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">参加者追加</h2>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newParticipantName}
-                    onChange={(e) => setNewParticipantName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddParticipant()}
-                    placeholder="名前を入力"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    onClick={handleAddParticipant}
-                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-                  >
-                    追加
-                  </button>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden flex-1">
+              {/* アコーディオンヘッダー */}
+              <button
+                onClick={() => setIsParticipantsOpen(!isParticipantsOpen)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-gray-800">参加者管理</h2>
+                  <span className="text-sm text-gray-600">({state.participants.length}人 / 抽選対象: {eligibleParticipants.length}人)</span>
                 </div>
-              </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className={`w-6 h-6 transition-transform duration-200 ${isParticipantsOpen ? 'rotate-180' : ''}`}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
 
-              {/* 参加者リスト */}
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  参加者リスト ({state.participants.length}人 / 抽選対象: {eligibleParticipants.length}人)
-                </h2>
-                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              {/* アコーディオンコンテンツ */}
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isParticipantsOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="px-6 pb-6">
+                  {/* 参加者追加 */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">参加者追加</h3>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newParticipantName}
+                        onChange={(e) => setNewParticipantName(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddParticipant()}
+                        placeholder="名前を入力"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={handleAddParticipant}
+                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                      >
+                        追加
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 参加者リスト */}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">参加者リスト</h3>
+                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
                   {state.participants.length === 0 ? (
                     <p className="text-gray-500 text-center py-4">参加者がいません</p>
                   ) : (
@@ -295,7 +322,9 @@ export default function Home() {
                         </div>
                       </div>
                     ))
-                  )}
+                    )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
