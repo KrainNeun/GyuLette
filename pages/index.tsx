@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/router';
 import { Participant, AppState } from '@/types';
 import { RouletteWheel } from '@/components/RouletteWheel';
 import { WinnerModal } from '@/components/WinnerModal';
@@ -14,7 +13,6 @@ import { performLottery, getEligibleParticipants } from '@/lib/lottery';
 import { createWheelSegments, calculateFinalRotation } from '@/lib/wheel';
 
 export default function Home() {
-  const router = useRouter();
   
   const [state, setState] = useState<AppState>({
     version: 1,
@@ -188,20 +186,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
-      <div className="max-w-[1280px] mx-auto">
+      <div className="max-w-[500px] mx-auto">
         {/* ヘッダー */}
-        <header className="text-center py-8">
+        <header className="text-center py-4">
           <img 
             src="gyulette-logo.png"
             alt="ぎゅ~れっと" 
-            className="mx-auto max-w-md w-full h-auto"
+            className="mx-auto w-1/2 h-auto"
           />
         </header>
 
-        {/* 2カラムレイアウト (左1:右2) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 左カラム: 参加者管理 + 設定 */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
+        {/* 縦1列レイアウト */}
+        <div className="flex flex-col gap-4">
             {/* 参加者管理 */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden flex-1">
               {/* アコーディオンヘッダー */}
@@ -426,60 +422,56 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* 右カラム: ルーレット + スピンボタン */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
-            {/* ルーレット */}
-            <div className="relative bg-white rounded-xl shadow-lg p-8 overflow-hidden flex-1">
-              {/* コンテンツ */}
-              <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                {/* ルーレットホイール */}
-                <div className="relative">
-                  {wheelSegments.length > 0 ? (
-                    <RouletteWheel
-                      segments={wheelSegments}
-                      rotation={rotation}
-                      isSpinning={isSpinning}
-                    />
-                  ) : (
-                    <div className="w-[500px] h-[500px] flex items-center justify-center border-4 border-dashed border-gray-300 rounded-full">
-                      <p className="text-gray-500 text-center">
-                        参加者を追加してください
-                      </p>
-                    </div>
-                  )}
-                </div>
+          {/* ルーレット */}
+          <div className="relative rounded-xl py-4 overflow-hidden">
+            {/* コンテンツ */}
+            <div className="relative z-10 flex flex-col items-center justify-center">
+              {/* ルーレットホイール */}
+              <div className="relative w-full px-4">
+                {wheelSegments.length > 0 ? (
+                  <RouletteWheel
+                    segments={wheelSegments}
+                    rotation={rotation}
+                    isSpinning={isSpinning}
+                  />
+                ) : (
+                  <div className="w-full aspect-square max-w-[350px] mx-auto flex items-center justify-center border-4 border-dashed border-gray-300 rounded-full">
+                    <p className="text-gray-500 text-center px-6">
+                      参加者を追加してください
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
+          </div>
 
-            {/* スピンボタン */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex flex-col items-center justify-center">
-                <button
-                  onClick={handleSpin}
-                  disabled={!canSpin}
-                  className={`px-12 py-4 text-xl font-bold rounded-full transition-all transform ${
-                    canSpin
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl hover:scale-105'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {isSpinning ? '抽選中...' : 'スピン!'}
-                </button>
+          {/* スピンボタン */}
+          <div className="rounded-xl py-4">
+            <div className="flex flex-col items-center justify-center">
+              <button
+                onClick={handleSpin}
+                disabled={!canSpin}
+                className={`w-full max-w-[300px] py-4 text-xl font-bold rounded-full transition-all transform ${
+                  canSpin
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl active:scale-95'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {isSpinning ? '抽選中...' : 'スピン!'}
+              </button>
 
-                {/* 警告メッセージ */}
-                {state.participants.length === 0 && (
-                  <p className="mt-4 text-red-600 font-semibold">
-                    ⚠️ 参加者がいません
-                  </p>
-                )}
-                {state.participants.length > 0 && eligibleParticipants.length === 0 && (
-                  <p className="mt-4 text-red-600 font-semibold">
-                    ⚠️ 全員が除外されています
-                  </p>
-                )}
-              </div>
+              {/* 警告メッセージ */}
+              {state.participants.length === 0 && (
+                <p className="mt-4 text-red-600 font-semibold text-center">
+                  ⚠️ 参加者がいません
+                </p>
+              )}
+              {state.participants.length > 0 && eligibleParticipants.length === 0 && (
+                <p className="mt-4 text-red-600 font-semibold text-center">
+                  ⚠️ 全員が除外されています
+                </p>
+              )}
             </div>
           </div>
         </div>

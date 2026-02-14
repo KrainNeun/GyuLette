@@ -13,15 +13,24 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
   isSpinning,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const size = 500;
+    // コンテナのサイズを取得
+    const containerWidth = container.clientWidth;
+    const size = Math.min(containerWidth, 400); // 最大5400px
+    
+    // Canvasの実際のサイズを設定
+    canvas.width = size;
+    canvas.height = size;
+    
     const centerX = size / 2;
     const centerY = size / 2;
     const radius = size / 2 - 10;
@@ -93,7 +102,8 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#000000';
-      ctx.font = 'bold 16px sans-serif';
+      const fontSize = Math.max(12, size * 0.032); // サイズに応じてフォントサイズを調整
+      ctx.font = `bold ${fontSize}px sans-serif`;
       
       const textX = radius * 0.5;
       const name = segment.participant.name;
@@ -112,8 +122,9 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
     ctx.restore();
 
     // 中央の円
+    const centerCircleRadius = size * 0.06; // サイズに応じて調整
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, centerCircleRadius, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.strokeStyle = '#333333';
@@ -128,17 +139,28 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
     ctx.stroke();
   }, [segments, rotation]);
 
+  // ウィンドウリサイズ時に再描画
+  useEffect(() => {
+    const handleResize = () => {
+      // 再描画をトリガー
+      if (canvasRef.current) {
+        canvasRef.current.width = canvasRef.current.width;
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative w-full">
       <canvas
         ref={canvasRef}
-        width={500}
-        height={500}
-        className={`transition-opacity ${isSpinning ? 'opacity-90' : 'opacity-100'}`}
+        className={`w-full h-auto transition-opacity ${isSpinning ? 'opacity-90' : 'opacity-100'}`}
       />
       {/* ポインター（12時の位置） */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2">
-        <div className="w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[25px] border-t-red-500 drop-shadow-lg" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1">
+        <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-red-500 drop-shadow-lg" />
       </div>
     </div>
   );
